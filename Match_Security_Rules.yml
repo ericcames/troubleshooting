@@ -1,0 +1,10 @@
+---
+- name: PANOS Match Security Rules
+  hosts: panorama
+  gather_facts: no
+  connection: local
+  roles:
+    - panorama_match_rules
+
+# Panorama NOT is supported. However, specifying Panorama provider info with a target serial number is.
+# https://galaxy.ansible.com/ui/repo/published/paloaltonetworks/panos/content/module/panos_match_rule/
