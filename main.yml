@@ -1,0 +1,27 @@
+---
+- name: include required vars
+  include_vars:
+    file: group_vars/panorama.yml
+
+- name: Test PanOS Match Rules
+  paloaltonetworks.panos.panos_match_rule:
+    provider:
+      ip_address: "{{ panorama_host }}"
+      api_key: "{{ netops_ansible_workshop_api_key }}"
+      serial_number: "{{ fw_serial_number }}"
+    source_ip: "{{ source_ip }}"
+    destination_ip: "{{ destination_ip }}"
+    destination_port: "{{ destination_port }}"
+    protocol: '6'
+    rule_type: 'security'
+  register: result
+
+- name: Display matched rule results
+  ansible.builtin.debug:
+    msg: "The rule named '{{ result.rule.name }}' has an action of '{{ result.rule.action }}' between the source IP: {{ result.rule.source }} within the source zone: {{ result.rule.fromzone }} and the destination IP: {{ result.rule.destination }} within the destination zone: {{ result.rule.tozone }} on the application: {{ result.rule.application }}."
+
+- name: Convert security rules to JSON and save locally
+  copy:
+    content: "{{ result | to_nice_json }}"
+    dest: "/tmp/matched_rule.json"
+  delegate_to: localhost
